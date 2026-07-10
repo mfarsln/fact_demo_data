@@ -1,0 +1,53 @@
+// ============================================================
+// FACT - GitHub'dan günlük güncellenen demo verisi
+// Bağlantı: Web File connector
+//   URL: https://raw.githubusercontent.com/<KULLANICI>/<REPO>/main/data/fact.csv
+//   (repo public ise auth gerekmez; private ise Web File'da token'lı URL kullan)
+// ============================================================
+
+SET ThousandSep='.';
+SET DecimalSep=',';
+SET DateFormat='DD.MM.YYYY';
+
+FACT:
+LOAD
+    [Bölge Adı],
+    [Şehir],
+    [İlçe],
+    [Mağaza_2],
+    [Mağaza],
+    [Magaza_ID],
+    [Ürün Ana Grubu],
+    [Ürün Kategori],
+    [Ürün Marka],
+    [Ürün Adı],
+    [Satış Tipi],
+    Date(Date#(Tarih, 'YYYY-MM-DD'))            as Tarih,
+    Num#(Tarihnum)                              as Tarihnum,
+    Num#(Yıl)                                   as Yıl,
+    Num#(Ay)                                    as Ay,
+    Num#(AyNum)                                 as AyNum,
+    Date(MonthStart(Date#(Tarih,'YYYY-MM-DD')), 'YYYY-MM') as Yıl_Ay,
+    Num#(Gun)                                   as Gun,
+    Num#(Hafta)                                 as Hafta,
+    Num#(Haftanıngunu)                          as Haftanıngunu,
+    Num#(Ciro, '#.##', '.', ',')                as Ciro,
+    Num#(Maliyet, '#.##', '.', ',')             as Maliyet,
+    Num#(Kâr, '#.##', '.', ',')                 as Kâr,
+    Num#([Kâr %], '#.##', '.', ',')             as [Kâr %],
+    Num#([Sepet Ortalaması], '#.##', '.', ',')  as [Sepet Ortalaması],
+    Num#([Kampanya Sayısı])                     as [Kampanya Sayısı],
+    Num#([Kampanya Tutarı], '#.##', '.', ',')   as [Kampanya Tutarı],
+    Num#([İade Tutar], '#.##', '.', ',')        as [İade Tutar],
+    Num#([İndirim Oranı], '#.##', '.', ',')     as [İndirim Oranı],
+    Num#([Yeni Müşteri %])                      as [Yeni Müşteri %],
+    Num#([Yeni Müşteri Sayı])                   as [Yeni Müşteri Sayı],
+    Num#(Miktar)                                as Miktar,
+    Num#(Hedef, '#.##', '.', ',')               as Hedef,
+    Num#(MemberID)                              as MemberID,
+    Kampanya
+FROM [lib://GitHub_FactData/fact.csv]
+(txt, utf8, embedded labels, delimiter is ';', msq);
+
+// İstersen QVD olarak da sakla (app içi kullanım yeterliyse gerek yok):
+// STORE FACT INTO [lib://DataFiles/FACT.qvd] (qvd);
